@@ -1,13 +1,10 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider        = "prisma-client-js"
 }
 
 model User {
@@ -18,17 +15,17 @@ model User {
   password        String
   tickets         Ticket[]  @relation("UserTickets")
   assignedTickets Ticket[]  @relation("AssignedTickets")
-  comments        Comment[] @relation("UserComments")
+  comments        Comment[]
 }
 
 model Ticket {
   id           String    @id @default(auto()) @map("_id") @db.ObjectId
-  subject      String
+  title        String
   description  String
   status       String
   priority     String
-  userId       String    @db.ObjectId
-  author       User      @relation("UserTickets", fields: [userId], references: [id])
+  authorId     String    @db.ObjectId
+  author       User      @relation("UserTickets", fields: [authorId], references: [id])
   assignedToId String?   @db.ObjectId
   assignedTo   User?     @relation("AssignedTickets", fields: [assignedToId], references: [id])
   comments     Comment[]
@@ -41,5 +38,5 @@ model Comment {
   ticketId  String   @db.ObjectId
   ticket    Ticket   @relation(fields: [ticketId], references: [id])
   authorId  String   @db.ObjectId
-  author    User     @relation("UserComments", fields: [authorId], references: [id])
+  author    User     @relation(fields: [authorId], references: [id])
 }

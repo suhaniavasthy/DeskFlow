@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
+import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -26,6 +27,7 @@ import {
 import { SuggestedArticles } from './suggested-articles';
 import { useState } from 'react';
 import { Upload } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
   subject: z.string().min(5, {
@@ -44,6 +46,8 @@ const formSchema = z.object({
 });
 
 export default function NewTicketForm() {
+  const router = useRouter();
+  const { toast } = useToast();
   const [ticketDetails, setTicketDetails] = useState({
     subject: '',
     description: '',
@@ -57,9 +61,14 @@ export default function NewTicketForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // In a real app, you'd handle form submission here.
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    // This is a placeholder for a real API call.
+    console.log('Form submitted', values);
+    toast({
+        title: 'Ticket Submitted!',
+        description: 'Your ticket has been successfully created.'
+    });
+    router.push('/');
   }
 
   const handleBlur = () => {

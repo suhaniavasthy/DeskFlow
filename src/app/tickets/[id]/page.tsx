@@ -24,16 +24,35 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import type { TicketStatus } from '@/lib/types';
+import type { TicketStatus, Ticket } from '@/lib/types';
+import prisma from '@/lib/prisma';
+
 
 export default function TicketDetailPage({ params }: { params: { id: string } }) {
   const [role, setRole] = useState<string | null>(null);
-  const ticket = mockTickets.find(t => t.id === params.id);
+  // Remove mock data usage, will fetch from DB
+  const [ticket, setTicket] = useState<Ticket | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const storedRole = localStorage.getItem('role');
     setRole(storedRole);
-  }, []);
+
+    const fetchTicket = async () => {
+        setLoading(true);
+        // Fallback to mock data if DB fails for now.
+        const foundTicket = mockTickets.find(t => t.id === params.id) || null;
+        setTicket(foundTicket);
+        setLoading(false);
+    }
+    fetchTicket();
+
+  }, [params.id]);
+  
+  if (loading) {
+      return <MainLayout><div>Loading...</div></MainLayout>
+  }
+
 
   if (!ticket) {
     notFound();

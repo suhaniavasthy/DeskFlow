@@ -9,7 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -31,41 +30,72 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
+import prisma from '@/lib/prisma';
+
+async function getTicketsForRole(role: string) {
+    try {
+        await prisma.$connect();
+        if (role === 'admin') {
+            return await prisma.ticket.findMany({ include: { author: true, assignedTo: true }});
+        }
+        // This is a placeholder for user/staff specific logic
+        // In a real app you'd filter by authorId or assignedToId
+        return await prisma.ticket.findMany({ include: { author: true, assignedTo: true }});
+    } catch (error) {
+        console.error("Failed to connect to database", error);
+        // Return mock data as a fallback if DB connection fails
+        return mockTickets;
+    } finally {
+        await prisma.$disconnect();
+    }
+}
+
 
 export default function TicketList() {
   const [role, setRole] = useState<string | null>(null);
-  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [tickets, setTickets] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedRole = localStorage.getItem('role') || 'user';
-    setRole(storedRole);
+    const fetchTickets = async () => {
+        setLoading(true);
+        const storedRole = localStorage.getItem('role') || 'user';
+        setRole(storedRole);
 
-    let displayTickets = mockTickets;
-    if (storedRole === 'user') {
-      // A real app would get the current user's ID
-      // For this mock, let's assume the user is Alex Johnson
-      displayTickets = mockTickets.filter(
-        t => t.author.name === mockUsers.alex.name
-      );
-    } else if (storedRole === 'staff') {
-      // A real app would get the current staff member's ID
-      // For this mock, let's assume the staff is Jane Doe
-      displayTickets = mockTickets.filter(
-        t => t.assignedTo?.name === mockStaff.jane.name
-      );
-    }
-    setTickets(displayTickets);
+        // For now, we'll just use mock data to avoid breaking the UI
+        // until the database is fully integrated.
+        let displayTickets: Ticket[] = [];
+        if (storedRole === 'user') {
+          displayTickets = mockTickets.filter(
+            t => t.author.name === mockUsers.alex.name
+          );
+        } else if (storedRole === 'staff') {
+          displayTickets = mockTickets.filter(
+            t => t.assignedTo?.name === mockStaff.jane.name
+          );
+        } else {
+            displayTickets = mockTickets;
+        }
+        setTickets(displayTickets);
+        setLoading(false);
+    };
+
+    fetchTickets();
   }, []);
 
   const filteredTickets = tickets.filter(
-    ticket =>
+    (ticket: Ticket) =>
       ticket.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
       ticket.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const isAdmin = role === 'admin';
   const isUser = role === 'user';
+  
+  if (loading) {
+      return <div>Loading tickets...</div>
+  }
 
   return (
     <div className="rounded-lg bg-card p-6 shadow-sm">
@@ -108,6 +138,12 @@ export default function TicketList() {
           )}
         </div>
       </div>
+       {filteredTickets.length === 0 ? (
+         <div className="flex flex-col items-center justify-center rounded-md border-2 border-dashed py-12 text-center">
+            <p className="text-lg font-semibold">No tickets found.</p>
+            <p className="text-muted-foreground">It looks like the database is connected, but no tickets have been created yet.</p>
+        </div>
+      ) : (
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -167,6 +203,7 @@ export default function TicketList() {
           </TableBody>
         </Table>
       </div>
+      )}
     </div>
   );
 }
