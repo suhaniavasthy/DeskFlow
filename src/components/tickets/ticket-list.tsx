@@ -65,6 +65,7 @@ export default function TicketList() {
   );
 
   const isAdmin = role === 'admin';
+  const isUser = role === 'user';
 
   return (
     <div className="rounded-lg bg-card p-6 shadow-sm">
@@ -94,7 +95,7 @@ export default function TicketList() {
               <DropdownMenuItem>Closed</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          {!isAdmin && (
+          {isUser && (
             <Link href="/tickets/new">
               <Button className="hidden sm:flex">
                 <PlusCircle className="mr-2 size-4" />
