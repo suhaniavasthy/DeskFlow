@@ -26,8 +26,8 @@ export default function AdminLoginPage() {
     // In a real app, you'd have proper authentication.
     // Here we'll just simulate an admin login.
     if (
-      email.toLowerCase() === 'admin@example.com' &&
-      password === 'password'
+      email.toLowerCase() === 'admin@mail.com' &&
+      password === '12345678'
     ) {
       localStorage.setItem('isAdmin', 'true');
       router.push('/admin');
