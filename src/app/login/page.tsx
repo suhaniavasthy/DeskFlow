@@ -15,34 +15,51 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Ticket } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('user');
 
   const handleLogin = () => {
-    // In a real app, you'd have proper authentication.
-    // Here we'll just simulate a user login.
-    if (email.toLowerCase() === 'admin@example.com') {
-       toast({
-        title: 'Error',
-        description: 'This is a user login page. For admin access, please go to the admin login page.',
-        variant: 'destructive',
-      });
-      return;
-    }
-    
-    if (email && password) {
-      localStorage.setItem('isAdmin', 'false');
-      router.push('/');
-    } else {
+    if (!email || !password) {
       toast({
         title: 'Error',
         description: 'Please enter your email and password.',
         variant: 'destructive',
       });
+      return;
+    }
+
+    localStorage.setItem('role', role);
+
+    if (role === 'admin') {
+      if (
+        email.toLowerCase() === 'admin@mail.com' &&
+        password === '12345678'
+      ) {
+        router.push('/admin');
+      } else {
+        localStorage.removeItem('role');
+        toast({
+          title: 'Error',
+          description: 'Invalid admin credentials.',
+          variant: 'destructive',
+        });
+      }
+    } else if (role === 'staff') {
+      router.push('/staff');
+    } else {
+      router.push('/');
     }
   };
 
@@ -56,11 +73,24 @@ export default function LoginPage() {
           </div>
           <CardTitle className="text-2xl">Welcome back</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account
+            Enter your credentials to login to your account
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="role">Role</Label>
+              <Select onValueChange={setRole} defaultValue={role}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="user">User</SelectItem>
+                  <SelectItem value="staff">Staff</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -93,11 +123,6 @@ export default function LoginPage() {
             <Button onClick={handleLogin} className="w-full">
               Login
             </Button>
-            <div className="text-center text-sm">
-                <Link href="/admin/login" className="underline">
-                    Admin Login
-                </Link>
-            </div>
           </div>
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{' '}

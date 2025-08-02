@@ -12,16 +12,21 @@ import {
 } from '@/components/ui/sidebar';
 import { Header } from '@/components/layout/header';
 import Link from 'next/link';
-import { Home, PlusCircle, Settings, Ticket } from 'lucide-react';
+import { Home, PlusCircle, Settings, Ticket, User, Briefcase } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export function MainLayout({ children }: { children: ReactNode }) {
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {
-    const adminStatus = localStorage.getItem('isAdmin');
-    setIsAdmin(adminStatus === 'true');
+    const storedRole = localStorage.getItem('role');
+    setRole(storedRole);
   }, []);
+  
+  const isAdmin = role === 'admin';
+  const isStaff = role === 'staff';
+  const isUser = role === 'user';
+
 
   return (
     <SidebarProvider>
@@ -34,22 +39,38 @@ export function MainLayout({ children }: { children: ReactNode }) {
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Dashboard">
-                <Link href="/">
-                  <Home />
-                  <span>Dashboard</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="New Ticket">
-                <Link href="/tickets/new">
-                  <PlusCircle />
-                  <span>New Ticket</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+            { (isUser || !role) &&
+              <>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip="Dashboard">
+                    <Link href="/">
+                      <Home />
+                      <span>Dashboard</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip="New Ticket">
+                    <Link href="/tickets/new">
+                      <PlusCircle />
+                      <span>New Ticket</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </>
+            }
+             { isStaff &&
+              <>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip="Dashboard">
+                    <Link href="/staff">
+                      <Briefcase />
+                      <span>Staff Dashboard</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </>
+            }
             {isAdmin && (
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Admin">
