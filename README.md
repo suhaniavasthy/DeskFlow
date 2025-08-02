@@ -1,5 +1,4 @@
-# Firebase Studio
+DeskFlow
 
-This is a NextJS starter in Firebase Studio.
-
-To get started, take a look at src/app/page.tsx.
+It is a quick and easy ticketing system
+It makes the generation of tickets and tracking their progress a breeze for everyone
