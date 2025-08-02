@@ -1,14 +1,14 @@
 datasource db {
-  provider = "mongodb"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 generator client {
-  provider        = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 model User {
-  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  id              String    @id @default(uuid())
   name            String
   email           String    @unique
   role            String
@@ -19,24 +19,24 @@ model User {
 }
 
 model Ticket {
-  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  id           String    @id @default(uuid())
   title        String
   description  String
   status       String
   priority     String
-  authorId     String    @db.ObjectId
+  authorId     String
   author       User      @relation("UserTickets", fields: [authorId], references: [id])
-  assignedToId String?   @db.ObjectId
+  assignedToId String?
   assignedTo   User?     @relation("AssignedTickets", fields: [assignedToId], references: [id])
   comments     Comment[]
 }
 
 model Comment {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(uuid())
   message   String
   timestamp DateTime @default(now())
-  ticketId  String   @db.ObjectId
+  ticketId  String
   ticket    Ticket   @relation(fields: [ticketId], references: [id])
-  authorId  String   @db.ObjectId
+  authorId  String
   author    User     @relation(fields: [authorId], references: [id])
 }
