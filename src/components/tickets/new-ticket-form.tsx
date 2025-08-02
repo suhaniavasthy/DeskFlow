@@ -1,10 +1,12 @@
-'use client';
+'use client'; // Ensures this component runs on the client side
 
+// React and validation imports
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { useRouter } from 'next/navigation';
 
+// UI components
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -24,11 +26,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { SuggestedArticles } from './suggested-articles';
+import { SuggestedArticles } from './suggested-articles'; // Related help articles based on subject/description
 import { useState } from 'react';
-import { Upload } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Upload } from 'lucide-react'; // Icon for file upload
+import { useToast } from '@/hooks/use-toast'; // Toast notification hook
 
+// Define the schema using Zod for form validation
 const formSchema = z.object({
   subject: z.string().min(5, {
     message: 'Subject must be at least 5 characters.',
@@ -42,17 +45,21 @@ const formSchema = z.object({
   description: z.string().min(20, {
     message: 'Description must be at least 20 characters.',
   }),
-  attachment: z.any().optional(),
+  attachment: z.any().optional(), // Optional file upload
 });
 
+// The main ticket creation form component
 export default function NewTicketForm() {
-  const router = useRouter();
-  const { toast } = useToast();
+  const router = useRouter(); // Used for redirection after form submission
+  const { toast } = useToast(); // Used for showing success/error messages
+
+  // Used to pass input to the SuggestedArticles component
   const [ticketDetails, setTicketDetails] = useState({
     subject: '',
     description: '',
   });
 
+  // Initialize form with default values and validation schema
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -61,16 +68,19 @@ export default function NewTicketForm() {
     },
   });
 
+  // Form submission handler
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // This is a placeholder for a real API call.
-    console.log('Form submitted', values);
+    console.log('Form submitted', values); // Replace with actual API call
+
     toast({
-        title: 'Ticket Submitted!',
-        description: 'Your ticket has been successfully created.'
+      title: 'Ticket Submitted!',
+      description: 'Your ticket has been successfully created.',
     });
-    router.push('/');
+
+    router.push('/'); // Redirect to homepage after submission
   }
 
+  // Handle blur event to update suggested articles
   const handleBlur = () => {
     const { subject, description } = form.getValues();
     if (subject && description) {
@@ -79,10 +89,13 @@ export default function NewTicketForm() {
   };
 
   return (
+    // Grid layout for form and sidebar
     <div className="grid gap-10 md:grid-cols-3">
+      {/* Left side: the form itself */}
       <div className="md:col-span-2">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            {/* Subject input field */}
             <FormField
               control={form.control}
               name="subject"
@@ -100,7 +113,10 @@ export default function NewTicketForm() {
                 </FormItem>
               )}
             />
+
+            {/* Category and Priority dropdowns side by side */}
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+              {/* Category dropdown */}
               <FormField
                 control={form.control}
                 name="category"
@@ -132,6 +148,8 @@ export default function NewTicketForm() {
                   </FormItem>
                 )}
               />
+
+              {/* Priority dropdown */}
               <FormField
                 control={form.control}
                 name="priority"
@@ -159,6 +177,8 @@ export default function NewTicketForm() {
                 )}
               />
             </div>
+
+            {/* Description textarea field */}
             <FormField
               control={form.control}
               name="description"
@@ -182,6 +202,7 @@ export default function NewTicketForm() {
               )}
             />
 
+            {/* File upload input (optional) */}
             <FormItem>
               <FormLabel>Attachment (Optional)</FormLabel>
               <FormControl>
@@ -194,10 +215,13 @@ export default function NewTicketForm() {
               </FormControl>
             </FormItem>
 
+            {/* Submit button */}
             <Button type="submit">Submit Ticket</Button>
           </form>
         </Form>
       </div>
+
+      {/* Right side: suggested articles based on user input */}
       <div className="space-y-6">
         <h3 className="text-lg font-semibold font-headline">
           Need a quick answer?
@@ -210,3 +234,4 @@ export default function NewTicketForm() {
     </div>
   );
 }
+
