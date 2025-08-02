@@ -1,3 +1,5 @@
+'use client';
+
 import type { ReactNode } from 'react';
 import {
   SidebarProvider,
@@ -11,8 +13,16 @@ import {
 import { Header } from '@/components/layout/header';
 import Link from 'next/link';
 import { Home, PlusCircle, Settings, Ticket } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export function MainLayout({ children }: { children: ReactNode }) {
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const adminStatus = localStorage.getItem('isAdmin');
+    setIsAdmin(adminStatus === 'true');
+  }, []);
+
   return (
     <SidebarProvider>
       <Sidebar>
@@ -40,14 +50,16 @@ export function MainLayout({ children }: { children: ReactNode }) {
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Admin">
-                <Link href="/admin">
-                  <Settings />
-                  <span>Admin</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+            {isAdmin && (
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Admin">
+                  <Link href="/admin">
+                    <Settings />
+                    <span>Admin</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
           </SidebarMenu>
         </SidebarContent>
       </Sidebar>

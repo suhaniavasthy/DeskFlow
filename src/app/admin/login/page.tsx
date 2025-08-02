@@ -13,10 +13,10 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Ticket } from 'lucide-react';
+import { Ticket, Shield } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-export default function LoginPage() {
+export default function AdminLoginPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [email, setEmail] = useState('');
@@ -24,23 +24,17 @@ export default function LoginPage() {
 
   const handleLogin = () => {
     // In a real app, you'd have proper authentication.
-    // Here we'll just simulate a user login.
-    if (email.toLowerCase() === 'admin@example.com') {
-       toast({
-        title: 'Error',
-        description: 'This is a user login page. For admin access, please go to the admin login page.',
-        variant: 'destructive',
-      });
-      return;
-    }
-    
-    if (email && password) {
-      localStorage.setItem('isAdmin', 'false');
-      router.push('/');
+    // Here we'll just simulate an admin login.
+    if (
+      email.toLowerCase() === 'admin@example.com' &&
+      password === 'password'
+    ) {
+      localStorage.setItem('isAdmin', 'true');
+      router.push('/admin');
     } else {
       toast({
         title: 'Error',
-        description: 'Please enter your email and password.',
+        description: 'Invalid admin credentials.',
         variant: 'destructive',
       });
     }
@@ -51,12 +45,12 @@ export default function LoginPage() {
       <Card className="w-full max-w-md mx-auto">
         <CardHeader className="space-y-1 text-center">
           <div className="mb-4 flex items-center justify-center gap-2">
-            <Ticket className="size-8 text-primary" />
-            <h1 className="font-headline text-3xl font-bold">DeskFlow</h1>
+            <Shield className="size-8 text-primary" />
+            <h1 className="font-headline text-3xl font-bold">Admin Access</h1>
           </div>
-          <CardTitle className="text-2xl">Welcome back</CardTitle>
+          <CardTitle className="text-2xl">Administrator Login</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account
+            Please enter your admin credentials to continue
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -66,22 +60,14 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="m@example.com"
+                placeholder="admin@example.com"
                 required
                 value={email}
                 onChange={e => setEmail(e.target.value)}
               />
             </div>
             <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
-                <Link
-                  href="#"
-                  className="ml-auto inline-block text-sm underline"
-                >
-                  Forgot your password?
-                </Link>
-              </div>
+              <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -94,16 +80,10 @@ export default function LoginPage() {
               Login
             </Button>
             <div className="text-center text-sm">
-                <Link href="/admin/login" className="underline">
-                    Admin Login
+                <Link href="/login" className="underline">
+                    User Login
                 </Link>
             </div>
-          </div>
-          <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{' '}
-            <Link href="/register" className="underline">
-              Sign up
-            </Link>
           </div>
         </CardContent>
       </Card>
