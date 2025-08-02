@@ -1,42 +1,71 @@
+// Define the database source with PostgreSQL as the provider.
+// The connection URL is pulled from an environment variable named DATABASE_URL.
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+// Generate the Prisma Client with JavaScript/TypeScript support
 generator client {
   provider = "prisma-client-js"
 }
 
+// ===============================
+// User Model
+// ===============================
 model User {
-  id              String    @id @default(uuid())
-  name            String
-  email           String    @unique
-  role            String
-  password        String
+  id              String    @id @default(uuid())         // Primary key, generated as UUID
+  name            String                                // User's name
+  email           String    @unique                     // User's email, must be unique
+  role            String                                // Role of the user (e.g., admin, staff, user)
+  password        String                                // Hashed password for authentication
+
+  // One-to-many relationship: a user can create multiple tickets
   tickets         Ticket[]  @relation("UserTickets")
+
+  // One-to-many relationship: a user (staff) can be assigned to multiple tickets
   assignedTickets Ticket[]  @relation("AssignedTickets")
+
+  // One-to-many relationship: a user can post multiple comments
   comments        Comment[]
 }
 
+// ===============================
+// Ticket Model
+// ===============================
 model Ticket {
-  id           String    @id @default(uuid())
-  title        String
-  description  String
-  status       String
-  priority     String
+  id           String    @id @default(uuid())            // Primary key, generated as UUID
+  title        String                                   // Title of the ticket
+  description  String                                   // Detailed issue description
+  status       String                                   // Current status (e.g., Open, In Progress, Resolved)
+  priority     String                                   // Priority level (e.g., Low, Medium, High, Urgent)
+
+  // Foreign key for the ticket's author
   authorId     String
-  author       User      @relation("UserTickets", fields: [authorId], references: [id])
+  author       User      @relation("UserTickets", fields: [authorId], references: [id]) // Relation to User (who created the ticket)
+
+  // Optional foreign key for the staff assigned to the ticket
   assignedToId String?
-  assignedTo   User?     @relation("AssignedTickets", fields: [assignedToId], references: [id])
+  assignedTo   User?     @relation("AssignedTickets", fields: [assignedToId], references: [id]) // Relation to User (who is assigned)
+
+  // One-to-many relationship: a ticket can have multiple comments
   comments     Comment[]
 }
 
+// ===============================
+// Comment Model
+// ===============================
 model Comment {
-  id        String   @id @default(uuid())
-  message   String
-  timestamp DateTime @default(now())
+  id        String   @id @default(uuid())                // Primary key, generated as UUID
+  message   String                                     // The actual comment message
+  timestamp DateTime @default(now())                   // Timestamp when the comment is created
+
+  // Foreign key and relation to the associated ticket
   ticketId  String
   ticket    Ticket   @relation(fields: [ticketId], references: [id])
+
+  // Foreign key and relation to the comment's author
   authorId  String
   author    User     @relation(fields: [authorId], references: [id])
 }
+
