@@ -1,5 +1,9 @@
-'use client';
+'use client'; // Enables client-side rendering in Next.js
+
+// Import custom layout component
 import { MainLayout } from '@/components/layout/main-layout';
+
+// Import reusable UI components
 import {
   Card,
   CardContent,
@@ -8,7 +12,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Trash2 } from 'lucide-react';
+import { PlusCircle, Trash2 } from 'lucide-react'; // Icons
 import { Input } from '@/components/ui/input';
 import {
   Table,
@@ -19,6 +23,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
+// Static list of ticket categories
 const categories = [
   { id: 1, name: 'Technical Support' },
   { id: 2, name: 'Billing Issue' },
@@ -26,10 +31,12 @@ const categories = [
   { id: 4, name: 'Feature Request' },
 ];
 
+// Functional component for Admin Settings Page
 export default function AdminSettingsPage() {
   return (
     <MainLayout>
       <div className="flex flex-col gap-8">
+        {/* Page Header */}
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-headline">
             Admin Settings
@@ -39,6 +46,7 @@ export default function AdminSettingsPage() {
           </p>
         </div>
 
+        {/* Category Management Card */}
         <Card>
           <CardHeader>
             <CardTitle>Category Management</CardTitle>
@@ -46,7 +54,9 @@ export default function AdminSettingsPage() {
               Add, edit, or remove ticket categories.
             </CardDescription>
           </CardHeader>
+
           <CardContent>
+            {/* Input and Add Category Button */}
             <div className="mb-4 flex items-center gap-2">
               <Input placeholder="New category name" />
               <Button>
@@ -54,6 +64,8 @@ export default function AdminSettingsPage() {
                 Add Category
               </Button>
             </div>
+
+            {/* Table displaying category list */}
             <div className="rounded-md border">
               <Table>
                 <TableHeader>
@@ -62,16 +74,19 @@ export default function AdminSettingsPage() {
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
+
                 <TableBody>
+                  {/* Map through the categories and render each row */}
                   {categories.map(category => (
                     <TableRow key={category.id}>
                       <TableCell className="font-medium">
                         {category.name}
                       </TableCell>
                       <TableCell className="text-right">
+                        {/* Delete button for category */}
                         <Button variant="ghost" size="icon">
                           <Trash2 className="size-4" />
-                           <span className="sr-only">Delete category</span>
+                          <span className="sr-only">Delete category</span>
                         </Button>
                       </TableCell>
                     </TableRow>
