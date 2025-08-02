@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Header } from '@/components/layout/header';
 import Link from 'next/link';
-import { Home, PlusCircle, Settings, Ticket, User, Briefcase } from 'lucide-react';
+import { Home, PlusCircle, Settings, Ticket, User, Briefcase, Folder } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export function MainLayout({ children }: { children: ReactNode }) {
@@ -65,21 +65,31 @@ export function MainLayout({ children }: { children: ReactNode }) {
                   <SidebarMenuButton asChild tooltip="Dashboard">
                     <Link href="/staff">
                       <Briefcase />
-                      <span>Staff Dashboard</span>
+                      <span>Assigned Tickets</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </>
             }
             {isAdmin && (
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Admin">
-                  <Link href="/admin">
-                    <Settings />
-                    <span>Admin</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              <>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip="All Tickets">
+                    <Link href="/admin">
+                      <Folder />
+                      <span>All Tickets</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip="Admin Settings">
+                    <Link href="/admin/settings">
+                      <Settings />
+                      <span>Settings</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </>
             )}
           </SidebarMenu>
         </SidebarContent>

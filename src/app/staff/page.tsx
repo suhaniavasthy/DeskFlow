@@ -9,10 +9,10 @@ export default function StaffDashboardPage() {
       <div className="flex flex-col gap-8">
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-headline">
-            Staff Dashboard
+            Assigned Tickets
           </h1>
           <p className="text-muted-foreground">
-            Welcome, Staff Member. Here are the tickets assigned to you.
+            These are the tickets that require your attention.
           </p>
         </div>
         <TicketList />
