@@ -1,75 +1,88 @@
-'use client';
+'use client'; // This directive makes the component run on the client side (Next.js)
 
-import { MainLayout } from '@/components/layout/main-layout';
-import { mockStaff, mockTickets } from '@/lib/mock-data';
-import { notFound } from 'next/navigation';
+import { MainLayout } from '@/components/layout/main-layout'; // App layout wrapper
+import { mockStaff, mockTickets } from '@/lib/mock-data'; // Mock data for fallback
+import { notFound } from 'next/navigation'; // For rendering a 404 page
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { TicketStatusBadge } from '@/components/tickets/ticket-status-badge';
-import { TicketConversation } from '@/components/tickets/ticket-conversation';
-import { Separator } from '@/components/ui/separator';
-import { format } from 'date-fns';
-import { Clock, Tag, User, Shield, Star, UserCheck } from 'lucide-react';
-import { useEffect, useState } from 'react';
+} from '@/components/ui/card'; // UI card components
+import { TicketStatusBadge } from '@/components/tickets/ticket-status-badge'; // Display badge for status
+import { TicketConversation } from '@/components/tickets/ticket-conversation'; // Chat/comment thread for ticket
+import { Separator } from '@/components/ui/separator'; // UI divider
+import { format } from 'date-fns'; // Date formatting utility
+import { Clock, Tag, User, Shield, Star, UserCheck } from 'lucide-react'; // Icons
+import { useEffect, useState } from 'react'; // React hooks
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import type { TicketStatus, Ticket } from '@/lib/types';
-import prisma from '@/lib/prisma';
-
+} from '@/components/ui/select'; // Custom select components
+import { Button } from '@/components/ui/button'; // UI button
+import type { TicketStatus, Ticket } from '@/lib/types'; // TypeScript types
+import prisma from '@/lib/prisma'; // Placeholder import (not used yet)
 
 export default function TicketDetailPage({ params }: { params: { id: string } }) {
+  // Store the user's role (admin, staff, etc.)
   const [role, setRole] = useState<string | null>(null);
-  // Remove mock data usage, will fetch from DB
+
+  // Store the ticket data
   const [ticket, setTicket] = useState<Ticket | null>(null);
+
+  // Show loading indicator while fetching
   const [loading, setLoading] = useState(true);
 
+  // Fetch data when the component mounts or ticket ID changes
   useEffect(() => {
     const storedRole = localStorage.getItem('role');
-    setRole(storedRole);
+    setRole(storedRole); // Load user role from localStorage
 
     const fetchTicket = async () => {
-        setLoading(true);
-        // Fallback to mock data if DB fails for now.
-        const foundTicket = mockTickets.find(t => t.id === params.id) || null;
-        setTicket(foundTicket);
-        setLoading(false);
-    }
-    fetchTicket();
+      setLoading(true);
 
+      // Fallback to mock data for now (simulate DB query)
+      const foundTicket = mockTickets.find(t => t.id === params.id) || null;
+      setTicket(foundTicket);
+
+      setLoading(false);
+    };
+
+    fetchTicket();
   }, [params.id]);
-  
+
+  // Show loading screen
   if (loading) {
-      return <MainLayout><div>Loading...</div></MainLayout>
+    return (
+      <MainLayout>
+        <div>Loading...</div>
+      </MainLayout>
+    );
   }
 
-
+  // If ticket not found, render 404 page
   if (!ticket) {
     notFound();
   }
 
+  // Allow editing if user is admin or staff
   const canEdit = role === 'admin' || role === 'staff';
 
   return (
     <MainLayout>
+      {/* Grid layout: two-thirds for content, one-third for metadata */}
       <div className="grid gap-8 lg:grid-cols-3">
+        {/* LEFT SECTION: Ticket content and conversation */}
         <div className="space-y-8 lg:col-span-2">
+          {/* Ticket subject and description */}
           <Card>
             <CardHeader>
               <p className="text-sm text-muted-foreground">Ticket #{ticket.id}</p>
-              <CardTitle className="font-headline text-3xl">
-                {ticket.subject}
-              </CardTitle>
+              <CardTitle className="font-headline text-3xl">{ticket.subject}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="prose prose-sm max-w-none dark:prose-invert">
@@ -78,15 +91,19 @@ export default function TicketDetailPage({ params }: { params: { id: string } })
             </CardContent>
           </Card>
 
+          {/* Chat or comment thread for the ticket */}
           <TicketConversation />
         </div>
+
+        {/* RIGHT SECTION: Ticket metadata and admin controls */}
         <div className="lg:col-span-1">
           <Card>
             <CardHeader>
               <CardTitle>Ticket Details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-               <div className="space-y-2">
+              {/* STATUS CONTROL */}
+              <div className="space-y-2">
                 <Label htmlFor="status">Status</Label>
                 {canEdit ? (
                   <Select defaultValue={ticket.status}>
@@ -97,7 +114,7 @@ export default function TicketDetailPage({ params }: { params: { id: string } })
                       <SelectItem value="Open">Open</SelectItem>
                       <SelectItem value="In Progress">In Progress</SelectItem>
                       <SelectItem value="Resolved">Resolved</SelectItem>
-                       <SelectItem value="Closed">Closed</SelectItem>
+                      <SelectItem value="Closed">Closed</SelectItem>
                     </SelectContent>
                   </Select>
                 ) : (
@@ -105,7 +122,8 @@ export default function TicketDetailPage({ params }: { params: { id: string } })
                 )}
               </div>
 
-               {role === 'admin' && (
+              {/* ASSIGNEE CONTROL (admin only) */}
+              {role === 'admin' && (
                 <div className="space-y-2">
                   <Label htmlFor="assignee">Assigned To</Label>
                   <Select defaultValue={ticket.assignedTo?.name}>
@@ -123,19 +141,24 @@ export default function TicketDetailPage({ params }: { params: { id: string } })
                 </div>
               )}
 
+              {/* Update Button (not wired to logic yet) */}
               {canEdit && <Button className="w-full">Update Ticket</Button>}
 
-              <Separator />
+              <Separator /> {/* Divider */}
 
+              {/* STATIC METADATA */}
               <div className="space-y-4">
-                 <div className="flex items-start gap-3">
+                {/* Author */}
+                <div className="flex items-start gap-3">
                   <User className="mt-1 size-5 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">Created by</p>
                     <p className="font-medium">{ticket.author.name}</p>
                   </div>
                 </div>
-                 {ticket.assignedTo && (
+
+                {/* Assignee */}
+                {ticket.assignedTo && (
                   <div className="flex items-start gap-3">
                     <UserCheck className="mt-1 size-5 text-muted-foreground" />
                     <div>
@@ -144,6 +167,8 @@ export default function TicketDetailPage({ params }: { params: { id: string } })
                     </div>
                   </div>
                 )}
+
+                {/* Priority */}
                 <div className="flex items-start gap-3">
                   <Star className="mt-1 size-5 text-muted-foreground" />
                   <div>
@@ -151,6 +176,8 @@ export default function TicketDetailPage({ params }: { params: { id: string } })
                     <p className="font-medium">{ticket.priority}</p>
                   </div>
                 </div>
+
+                {/* Category */}
                 <div className="flex items-start gap-3">
                   <Tag className="mt-1 size-5 text-muted-foreground" />
                   <div>
@@ -158,6 +185,8 @@ export default function TicketDetailPage({ params }: { params: { id: string } })
                     <p className="font-medium">{ticket.category}</p>
                   </div>
                 </div>
+
+                {/* Last Updated Date */}
                 <div className="flex items-start gap-3">
                   <Clock className="mt-1 size-5 text-muted-foreground" />
                   <div>
@@ -176,7 +205,8 @@ export default function TicketDetailPage({ params }: { params: { id: string } })
   );
 }
 
-// Helper component because ShadCN select is not a native element
+// Helper label component used for consistency with ShadCN UI
 const Label = (props: React.LabelHTMLAttributes<HTMLLabelElement>) => (
   <label className="text-sm font-medium text-muted-foreground" {...props} />
 );
+
