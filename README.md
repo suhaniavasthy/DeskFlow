@@ -1,6 +1,6 @@
-# QuickDesk
+# DeskFlow
 
-QuickDesk is a simple, easy-to-use help desk solution that allows users to raise support tickets, and support staff to manage and resolve them efficiently. The goal is to streamline communication between users and support teams — **without unnecessary complexity**.
+DeskFlow is a simple, easy-to-use help desk solution that allows users to raise support tickets, and support staff to manage and resolve them efficiently. The goal is to streamline communication between users and support teams — **without unnecessary complexity**.
 
 ---
 
@@ -19,7 +19,7 @@ QuickDesk is a simple, easy-to-use help desk solution that allows users to raise
 
 - **Frontend:** Next.js, React, TypeScript, Tailwind CSS  
 - **Backend:** Next.js API routes  
-- **Database:** SQL database (e.g., MySQL or PostgreSQL) managed by Prisma  
+- **Database:** SQL database (e.g., MySQL or PostgreSQL) managed by  Postgres
 - **Styling:** Tailwind CSS
 
 ---
